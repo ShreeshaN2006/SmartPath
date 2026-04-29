@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartPath | Intelligent Delivery Route Optimization</title>
+    <meta name="description" content="AI-powered delivery route optimization using Hybrid A* and DFS algorithms on real-world road networks">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- HEADER                                          -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <header class="app-header">
+        <div class="header-left">
+            <div class="logo">
+                <svg viewBox="0 0 32 32" fill="none" class="logo-icon">
+                    <path d="M16 2L4 8v16l12 6 12-6V8L16 2z" fill="url(#grad1)" opacity="0.9"/>
+                    <path d="M16 6l8 4v8l-8 4-8-4v-8l8-4z" fill="url(#grad2)" opacity="0.8"/>
+                    <circle cx="16" cy="14" r="3" fill="#fff" opacity="0.9"/>
+                    <path d="M16 17l-2 5h4l-2-5z" fill="#fff" opacity="0.8"/>
+                    <defs>
+                        <linearGradient id="grad1" x1="4" y1="2" x2="28" y2="30">
+                            <stop offset="0%" stop-color="#6366f1"/>
+                            <stop offset="100%" stop-color="#06b6d4"/>
+                        </linearGradient>
+                        <linearGradient id="grad2" x1="8" y1="6" x2="24" y2="22">
+                            <stop offset="0%" stop-color="#818cf8"/>
+                            <stop offset="100%" stop-color="#22d3ee"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <div>
+                    <h1>SmartPath</h1>
+                    <span class="subtitle">Hybrid A* + DFS Route Optimization</span>
+                </div>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="status-indicator" id="statusIndicator">
+                <span class="status-dot"></span>
+                <span class="status-text">Ready</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- MAIN LAYOUT                                     -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <main class="app-main">
+        <!-- ─── LEFT SIDEBAR ─── -->
+        <aside class="sidebar">
+            <!-- Controls Panel -->
+            <div class="panel" id="controlsPanel">
+                <div class="panel-header">
+                    <svg viewBox="0 0 20 20" fill="currentColor" class="panel-icon"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>
+                    <span>Route Controls</span>
+                </div>
+
+                <div class="control-group">
+                    <label>Set Locations</label>
+                    <div class="button-row">
+                        <button class="btn btn-source" id="btnSetSource">
+                            <svg viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="10" r="4"/></svg>
+                            Source
+                        </button>
+                        <button class="btn btn-dest" id="btnSetDest">
+                            <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 2L3 17h14L10 2z"/></svg>
+                            Destination
+                        </button>
+                    </div>
+                    <button class="btn btn-waypoint" id="btnWaypointMode" style="margin-top: 6px; width: 100%;">
+                        <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a1 1 0 011 1v1.3A7.002 7.002 0 0116.7 9H18a1 1 0 110 2h-1.3A7.002 7.002 0 0111 16.7V18a1 1 0 11-2 0v-1.3A7.002 7.002 0 013.3 11H2a1 1 0 110-2h1.3A7.002 7.002 0 019 4.3V3a1 1 0 011-1z"/></svg>
+                        + Add Waypoint Stops
+                    </button>
+                </div>
+
+                <div class="control-group">
+                    <label>Blockage Simulation</label>
+                    <div class="button-row">
+                        <button class="btn btn-block" id="btnBlockMode">
+                            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M13.477 14.89A6 6 0 015.11 6.524l8.367 8.368zm1.414-1.414L6.524 5.11a6 6 0 018.367 8.367zM18 10a8 8 0 11-16 0 8 8 0 0116 0z" clip-rule="evenodd"/></svg>
+                            Manual Block
+                        </button>
+                        <button class="btn btn-random" id="btnRandomBlock">
+                            <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a1 1 0 011 1v1.3A7.002 7.002 0 0116.7 9H18a1 1 0 110 2h-1.3A7.002 7.002 0 0111 16.7V18a1 1 0 11-2 0v-1.3A7.002 7.002 0 013.3 11H2a1 1 0 110-2h1.3A7.002 7.002 0 019 4.3V3a1 1 0 011-1z"/></svg>
+                            Random
+                        </button>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label>Traffic Simulation</label>
+                    <div class="traffic-slider-wrap">
+                        <input type="range" min="1" max="5" step="0.5" value="1" id="trafficSlider" class="traffic-slider">
+                        <div class="traffic-labels">
+                            <span class="traffic-val" id="trafficValue">1.0×</span>
+                            <span class="traffic-label-hint">congestion</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label>Actions</label>
+                    <button class="btn btn-primary btn-full" id="btnCalcRoute">
+                        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clip-rule="evenodd"/></svg>
+                        Calculate Route
+                    </button>
+                    <div class="button-row" style="margin-top: 8px;">
+                        <button class="btn btn-compare" id="btnCompare">
+                            <svg viewBox="0 0 20 20" fill="currentColor"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 6a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6z"/></svg>
+                            Compare
+                        </button>
+                        <button class="btn btn-clear" id="btnClear">
+                            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+                            Clear
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Legend Panel -->
+            <div class="panel" id="legendPanel">
+                <div class="panel-header">
+                    <svg viewBox="0 0 20 20" fill="currentColor" class="panel-icon"><path fill-rule="evenodd" d="M4 2a2 2 0 00-2 2v11a3 3 0 106 0V4a2 2 0 00-2-2H4zm1 14a1 1 0 100-2 1 1 0 000 2zm5-1.757l4.9-4.9a2 2 0 000-2.828L13.485 5.1a2 2 0 00-2.828 0L10 5.757v8.486zM16 18H9.071l6-6H16a2 2 0 012 2v2a2 2 0 01-2 2z" clip-rule="evenodd"/></svg>
+                    <span>Route Legend</span>
+                </div>
+                <div class="legend-items">
+                    <label class="legend-item toggle-item">
+                        <input type="checkbox" checked id="toggleAstar" class="route-toggle">
+                        <span class="legend-line astar-line"></span> A* Optimal Path
+                    </label>
+                    <label class="legend-item toggle-item">
+                        <input type="checkbox" checked id="toggleDfs" class="route-toggle">
+                        <span class="legend-line dfs-line"></span> DFS Recovery Path
+                    </label>
+                    <label class="legend-item toggle-item">
+                        <input type="checkbox" checked id="toggleMerged" class="route-toggle">
+                        <span class="legend-line merged-line"></span> Final Merged Route
+                    </label>
+                    <label class="legend-item toggle-item">
+                        <input type="checkbox" checked id="toggleBfs" class="route-toggle">
+                        <span class="legend-line bfs-line"></span> BFS Path (Compare)
+                    </label>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ─── MAP AREA ─── -->
+        <div class="map-container">
+            <div id="map"></div>
+            <!-- Floating info tooltip -->
+            <div class="map-tooltip" id="mapTooltip">Click on the map to set a location</div>
+        </div>
+
+        <!-- ─── RIGHT SIDEBAR ─── -->
+        <aside class="sidebar sidebar-right">
+            <!-- Tabs -->
+            <div class="tab-bar">
+                <button class="tab-btn active" data-tab="metrics">Metrics</button>
+                <button class="tab-btn" data-tab="comparison">Compare</button>
+                <button class="tab-btn" data-tab="info">Info</button>
+            </div>
+
+            <!-- Metrics Tab -->
+            <div class="tab-content active" id="tab-metrics">
+                <div class="panel metrics-panel">
+                    <div class="panel-header">
+                        <svg viewBox="0 0 20 20" fill="currentColor" class="panel-icon"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zm6-4a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zm6-3a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg>
+                        <span>Performance Metrics</span>
+                    </div>
+
+                    <div class="metrics-grid" id="metricsGrid">
+                        <div class="metric-card">
+                            <div class="metric-label">A* Nodes Expanded</div>
+                            <div class="metric-value" id="metricAstarNodes">—</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">A* Time</div>
+                            <div class="metric-value" id="metricAstarTime">—</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">A* Path Cost</div>
+                            <div class="metric-value" id="metricAstarCost">—</div>
+                        </div>
+                        <div class="metric-card accent">
+                            <div class="metric-label">DFS Nodes Expanded</div>
+                            <div class="metric-value" id="metricDfsNodes">—</div>
+                        </div>
+                        <div class="metric-card accent">
+                            <div class="metric-label">DFS Time</div>
+                            <div class="metric-value" id="metricDfsTime">—</div>
+                        </div>
+                        <div class="metric-card highlight">
+                            <div class="metric-label">Final Route Cost</div>
+                            <div class="metric-value" id="metricMergedCost">—</div>
+                        </div>
+                        <div class="metric-card highlight">
+                            <div class="metric-label">Total Execution</div>
+                            <div class="metric-value" id="metricTotalTime">—</div>
+                        </div>
+                        <div class="metric-card" id="blockageCard" style="display:none;">
+                            <div class="metric-label">Blockage Detected</div>
+                            <div class="metric-value blockage-yes" id="metricBlockage">⚠ YES</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comparison Tab -->
+            <div class="tab-content" id="tab-comparison">
+                <div class="panel">
+                    <div class="panel-header">
+                        <svg viewBox="0 0 20 20" fill="currentColor" class="panel-icon"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 6a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zm9 0a1 1 0 011-1h3a1 1 0 011 1v6a1 1 0 01-1 1h-3a1 1 0 01-1-1v-6z"/></svg>
+                        <span>Algorithm Comparison</span>
+                    </div>
+
+                    <div class="comparison-table" id="comparisonTable">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Metric</th>
+                                    <th class="hybrid-col">Hybrid A*/DFS</th>
+                                    <th class="bfs-col">BFS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Nodes Explored</td>
+                                    <td class="hybrid-col" id="cmpHybridNodes">—</td>
+                                    <td class="bfs-col" id="cmpBfsNodes">—</td>
+                                </tr>
+                                <tr>
+                                    <td>Time (ms)</td>
+                                    <td class="hybrid-col" id="cmpHybridTime">—</td>
+                                    <td class="bfs-col" id="cmpBfsTime">—</td>
+                                </tr>
+                                <tr>
+                                    <td>Path Cost (min)</td>
+                                    <td class="hybrid-col" id="cmpHybridCost">—</td>
+                                    <td class="bfs-col" id="cmpBfsCost">—</td>
+                                </tr>
+                                <tr>
+                                    <td>Path Found</td>
+                                    <td class="hybrid-col" id="cmpHybridSuccess">—</td>
+                                    <td class="bfs-col" id="cmpBfsSuccess">—</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="comparison-verdict" id="comparisonVerdict"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Tab -->
+            <div class="tab-content" id="tab-info">
+                <div class="panel">
+                    <div class="panel-header">
+                        <svg viewBox="0 0 20 20" fill="currentColor" class="panel-icon"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>
+                        <span>How It Works</span>
+                    </div>
+                    <div class="info-content">
+                        <div class="info-section">
+                            <h3>🔍 A* Search</h3>
+                            <p>Uses <code>f(n) = g(n) + h(n)</code> where <code>h(n)</code> is the Haversine distance. Finds the globally optimal path using a priority queue.</p>
+                        </div>
+                        <div class="info-section">
+                            <h3>🔄 DFS Recovery</h3>
+                            <p>When a blockage is detected on the A* path, DFS explores locally from the blocked point to find an alternate route that reconnects downstream.</p>
+                        </div>
+                        <div class="info-section">
+                            <h3>🧬 Hybrid Merge</h3>
+                            <p>The final path combines: A* segment before blockage + DFS detour around blockage + A* segment after rejoin point.</p>
+                        </div>
+                        <div class="info-section">
+                            <h3>📊 BFS Comparison</h3>
+                            <p>BFS explores uniformly without a heuristic. It typically expands far more nodes than A*, demonstrating the efficiency of informed search.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- LOADING OVERLAY                                 -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loader">
+            <div class="loader-ring"></div>
+            <div class="loader-text">Computing optimal route...</div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- TOAST NOTIFICATIONS                             -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- App JS -->
+    <script src="script.js"></script>
+</body>
+</html>

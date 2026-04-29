@@ -1,0 +1,6 @@
+flask==3.1.1
+flask-cors==5.0.1
+osmnx==2.1.0
+networkx==3.4.2
+geopy==2.4.1
+gunicorn==23.0.0
