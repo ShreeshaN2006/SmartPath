@@ -137,8 +137,12 @@ def get_route():
         return jsonify(response)
 
     except KeyError as e:
+        print(f"[ERROR] Missing field: {e}")
         return jsonify({'success': False, 'error': f'Missing required field: {e}'}), 400
     except Exception as e:
+        print(f"[ERROR] In /get-route: {e}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
@@ -203,6 +207,9 @@ def compare_algorithms():
         return jsonify(response)
 
     except Exception as e:
+        print(f"[ERROR] In /compare: {e}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
