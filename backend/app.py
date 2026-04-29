@@ -13,6 +13,7 @@ Endpoints:
 
 import os
 import random
+import logging
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 
@@ -24,6 +25,10 @@ FRONTEND_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'fronten
 
 app = Flask(__name__, static_folder=FRONTEND_DIR, static_url_path='')
 CORS(app)
+
+# ─── Logging Configuration ───
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # ─── Load Graph on Startup ───
 print("[SmartPath] Initializing road network graph...")
