@@ -1,22 +1,27 @@
 # SmartPath — Intelligent Delivery Route Optimization
 
-> AI-based delivery route optimization system using **Hybrid A\* + DFS** on real-world urban road networks.
+> AI-based delivery route optimization system using **Hybrid A\* + DFS** and Spatio-Temporal Graph Neural Networks on real-world urban road networks.
 
-![Python](https://img.shields.io/badge/Python-3.9+-blue)
-![Flask](https://img.shields.io/badge/Flask-3.1-green)
-![Leaflet](https://img.shields.io/badge/Leaflet-1.9-brightgreen)
+![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.5-3178C6?logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-5.4-646CFF?logo=vite&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4-38B2AC?logo=tailwindcss&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white)
+![Flask](https://img.shields.io/badge/Flask-3.1-000000?logo=flask&logoColor=white)
+![Vercel](https://img.shields.io/badge/Vercel-Deployed-black?logo=vercel&logoColor=white)
 
 ---
 
 ## Features
 
 - **Hybrid A\*/DFS Algorithm** — Globally optimal A\* search with DFS-based local recovery around blockages
+- **Spatio-Temporal GNNs (DCRNN)** — Deep graph neural network traffic flow forecasting
 - **Real-World Road Network** — Uses OSMnx to load actual street data from OpenStreetMap
 - **Haversine Heuristic** — Admissible heuristic using the great-circle distance formula
 - **Dynamic Blockage Simulation** — Manual and random road blockages with live re-routing
-- **Interactive Map** — Leaflet.js map with click-to-set source/destination/blockages
+- **Modern Interactive UI** — React 18 + Leaflet with click-to-set origin/destination/blockages and glassmorphism styling
 - **Delivery Animation** — Animated delivery marker tracing the computed route
-- **Performance Metrics** — Nodes expanded, path cost, execution time
+- **Performance Metrics** — Nodes expanded, path cost, execution time, MAE/RMSE analytics
 - **Algorithm Comparison** — Side-by-side Hybrid A\*/DFS vs BFS analysis
 - **Traffic Multiplier** — Real-time traffic simulation with dynamic edge weights
 
@@ -28,32 +33,40 @@ To get the best development experience in Visual Studio Code, install these exte
 
 1. **Python** (Microsoft) — Essential for running the Flask backend and debugging.
 2. **Pylance** (Microsoft) — Provides high-performance language support and type checking.
-3. **Prettier** (Prettier) — Ensures consistent styling for CSS and JavaScript files.
-4. **Error Lens** (Optional) — Highlights errors directly in the code for faster debugging.
-5. **Live Server** (Optional) — Useful if you are modifying the frontend without the Flask backend.
+3. **Tailwind CSS IntelliSense** — Autocomplete for utility classes.
+4. **ESLint** & **Prettier** — Code formatting and linting.
 
 ---
 
 ## Project Structure
 
 ```
-backend/
-  app.py                 # Flask REST API (serves frontend + 4 endpoints)
-  requirements.txt       # Python dependencies
-  algorithms/
-    __init__.py
-    astar.py             # Custom A* search with heapq + Haversine heuristic
-    dfs.py               # DFS recovery for local blockage avoidance
-    hybrid.py            # Hybrid A*/DFS orchestrator + BFS comparison
-  utils/
-    __init__.py
-    haversine.py         # Haversine distance formula (admissible heuristic)
-    graph_loader.py      # OSMnx graph loading with disk caching
-
-frontend/
-  index.html             # Main page with Leaflet map and control panels
-  styles.css             # Dark-themed premium UI with glassmorphism
-  script.js              # Map interaction, route drawing, and metrics
+├── api/                    # Vercel Serverless API proxies (TypeScript)
+│   ├── analytics.ts
+│   ├── health.ts
+│   ├── incidents.ts
+│   ├── map-bounds.ts
+│   ├── random-blockages.ts
+│   ├── route.ts
+│   ├── traffic.ts
+│   ├── vehicles.ts
+│   └── weather.ts
+├── backend/                # Python / Flask ML Backend
+│   ├── app.py              # Flask REST API
+│   ├── requirements.txt    # Python dependencies
+│   ├── algorithms/         # Hybrid A*, DFS, and BFS implementations
+│   ├── models/             # PyTorch DCRNN model architecture
+│   └── utils/              # Graph loader, Haversine metrics, weather helpers
+├── frontend/               # Modern React + Vite + TypeScript Frontend
+│   ├── src/
+│   │   ├── components/     # Reusable UI, Map, and Analytics components
+│   │   ├── pages/          # LandingPage, PlannerPage
+│   │   ├── hooks/          # Custom state and simulation hooks
+│   │   └── lib/            # API client and distance utilities
+│   ├── package.json
+│   └── vite.config.ts
+├── vercel.json             # Vercel deployment configuration
+└── package.json            # Root configuration & scripts
 ```
 
 ---
@@ -237,33 +250,38 @@ If DFS fails to find a recovery path, the system falls back to running A\* with 
 
 | Component | Technology |
 |---|---|
-| Backend | Python 3, Flask, OSMnx, NetworkX |
-| Frontend | HTML5, CSS3, JavaScript, Leaflet.js |
-| Heuristic | Haversine formula |
-| Data Source | OpenStreetMap (via OSMnx) |
-| Graph Format | NetworkX MultiDiGraph |
-| Deployment | Render, Railway, Vercel |
+| Frontend | React 18, TypeScript, Vite, Tailwind CSS, Leaflet, Framer Motion, Lucide Icons |
+| Backend | Python 3.11+, Flask, PyTorch (DCRNN), OSMnx, NetworkX, Scikit-learn |
+| Routing Algorithms | Hybrid A* (Haversine Priority Queue) + DFS Detour Recovery + BFS Benchmark |
+| Serverless Layer | Vercel Serverless Functions (`@vercel/node`) |
+| Data Source | OpenStreetMap (via OSMnx road graph extraction) |
+| Cloud Hosting | Vercel (Frontend & Serverless API), Render / Railway / Fly.io (ML Backend) |
 
 ---
 
-## Cloud Deployment (Render)
+## Deployment Guide
 
-This application is ready to be deployed to **Render** or any other cloud provider that supports Python.
+### 1. Deploy Frontend on Vercel
+1. Push your code to GitHub:
+   ```bash
+   git add .
+   git commit -m "Update project and configurations"
+   git push origin main
+   ```
+2. Go to [vercel.com/new](https://vercel.com/new) and import `ShreeshaN2006/SmartPath`.
+3. Vercel will automatically detect `vercel.json` and build the application.
+4. Set the environment variable:
+   - `BACKEND_URL` (optional): The URL of your deployed Python backend (e.g., `https://smartpath-backend.onrender.com`).
 
-### 1. Prepare your Repository
-- Ensure `backend/requirements.txt` includes `gunicorn`.
-- Ensure `graph_cache.graphml` is committed (to avoid long download times during the first request).
-
-### 2. Deploy to Render
+### 2. Deploy Backend on Render / Railway
 1. Create a new **Web Service** on Render.
-2. Connect your GitHub repository.
-3. Use the following settings:
-   - **Environment**: `Python 3`
+2. Connect your GitHub repository (`ShreeshaN2006/SmartPath`).
+3. Set the following settings:
    - **Root Directory**: `backend`
    - **Build Command**: `pip install -r requirements.txt`
    - **Start Command**: `gunicorn app:app`
-4. Add Environment Variables:
-   - `PORT`: `5000` (optional, Render sets this automatically)
-   - `FLASK_ENV`: `production`
+   - **Environment Variables**:
+     - `FLASK_ENV`: `production`
+     - `PYTHON_VERSION`: `3.11.0`
 
 ---

@@ -51,7 +51,9 @@ backend/graph_cache.graphml
 # Logs
 *.log
 
-# Frontend build
+# Frontend / Node build
+node_modules/
+.vercel/
 frontend/dist/
 frontend/node_modules/
 
