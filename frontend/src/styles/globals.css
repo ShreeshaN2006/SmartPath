@@ -1,0 +1,151 @@
+@import "tailwindcss/tailwind.css";
+
+@theme {
+  --color-brand-primary: #163359;
+  --color-brand-secondary: #2F5C93;
+  --color-brand-accent: #C83616;
+  --color-neutral-0: #FFFFFF;
+  --color-neutral-50: #F7F8F8;
+  --color-neutral-100: #F1F2F2;
+  --color-neutral-200: #E4E7E8;
+  --color-neutral-300: #AAB6BD;
+  --color-neutral-500: #899A9A;
+  --color-neutral-700: #4B4148;
+  --color-neutral-900: #0B0A0C;
+  --color-success: #16866A;
+  --color-warning: #B7791F;
+  --color-danger: #C83616;
+  --color-info: #2F5C93;
+}
+
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--color-neutral-0);
+    color: var(--color-neutral-900);
+    line-height: 1.5;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.2);
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(148, 163, 184, 0.35);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  .leaflet-container {
+    background: var(--color-neutral-0);
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  .leaflet-tile-pane {
+    filter: brightness(0.95) contrast(1.05) saturate(0.8);
+  }
+
+  .custom-marker {
+    background: none !important;
+    border: none !important;
+  }
+
+  .waypoint-badge {
+    width: 24px;
+    height: 24px;
+    background: linear-gradient(135deg, #6366f1 0%, #06b6d4 100%);
+    border-radius: 50%;
+    border: 2px solid white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 800;
+    color: white;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.5);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .delivery-marker {
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, #6366f1 0%, #06b6d4 100%);
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 0 12px rgba(99, 102, 241, 0.6);
+    animation: delivery-pulse 1s infinite;
+  }
+
+  @keyframes delivery-pulse {
+    0%, 100% { box-shadow: 0 0 12px rgba(99, 102, 241, 0.6); }
+    50% { box-shadow: 0 0 24px rgba(99, 102, 241, 0.9); }
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-success);
+    animation: pulse-dot 2s infinite;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); }
+    50% { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes toast-in {
+    from { opacity: 0; transform: translateX(40px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes toast-out {
+    from { opacity: 1; transform: translateX(0); }
+    to { opacity: 0; transform: translateX(40px); }
+  }
+
+  .focus-visible:focus {
+    outline: 2px solid var(--color-brand-primary);
+    outline-offset: 2px;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+}

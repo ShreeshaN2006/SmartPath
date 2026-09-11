@@ -1,0 +1,19 @@
+[build]
+builder = "dockerfile"
+dockerfilePath = "backend/Dockerfile"
+
+[deploy]
+healthcheckPath = "/api/health"
+healthcheckTimeout = 120
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3
+
+[deploy.env]
+FLASK_ENV = "production"
+TRAFFIC_PROVIDER = "simulation"
+WEATHER_PROVIDER = "open_meteo"
+INCIDENT_PROVIDER = "simulation"
+
+# Add these in Railway dashboard:
+# BACKEND_URL = https://your-app.railway.app
+# PYTHON_VERSION = 3.11

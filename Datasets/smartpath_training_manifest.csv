@@ -1,0 +1,4 @@
+file,rows,purpose,contents
+smartpath_traffic_model_ready.csv,8936,Primary forecasting table,Original traffic variables + encoded weather/roadwork + calendar + lag/rolling features
+smartpath_traffic_sequence_ready.csv,8824,Fixed-history sequence table,"Rows with 1,2,3,7-day historical lag features; suitable for reshaping into DCRNN sequences"
+traffic_nodes.csv,16,DCRNN graph node list,Unique road/intersection locations; coordinates intentionally blank because source did not provide them

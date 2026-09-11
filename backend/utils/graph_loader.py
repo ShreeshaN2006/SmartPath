@@ -10,8 +10,9 @@ The graph is a NetworkX MultiDiGraph where:
 """
 
 import os
-import osmnx as ox
+
 import networkx as nx
+import osmnx as ox
 
 # Cache file path (stored alongside the backend code)
 GRAPH_CACHE_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'graph_cache.graphml')
@@ -53,6 +54,11 @@ def load_graph() -> nx.MultiDiGraph:
     # Add travel_time weights to edges
     G = ox.add_edge_speeds(G)
     G = ox.add_edge_travel_times(G)
+
+    # Add congestion attribute (simulated)
+    import random
+    for u, v, key, data in G.edges(keys=True, data=True):
+        data['congestion'] = random.uniform(0.1, 0.7)
 
     print(f"[GraphLoader] Graph loaded: {G.number_of_nodes()} nodes, {G.number_of_edges()} edges")
     return G

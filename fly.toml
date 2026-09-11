@@ -1,0 +1,35 @@
+app = "smartpath-backend"
+primary_region = "ord"
+
+[build]
+  dockerfile = "backend/Dockerfile"
+
+[http_service]
+  internal_port = 5000
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+[vm]
+  memory = "1gb"
+  cpu_kind = "shared"
+  cpus = 1
+
+[env]
+  FLASK_ENV = "production"
+  TRAFFIC_PROVIDER = "simulation"
+  WEATHER_PROVIDER = "open_meteo"
+  INCIDENT_PROVIDER = "simulation"
+  # BACKEND_URL will be set after first deploy
+
+# Optional: GPU support for DCRNN training (requires paid plan)
+# [processes]
+#   app = "gunicorn --bind 0.0.0.0:5000 --workers 2 --timeout 120 app:app"
+#   train = "python -m training.train_dcrnn --epochs 100 --batch-size 32"
+
+# Optional: Persistent volume for model checkpoints
+# [mounts]
+#   source = "smartpath_models"
+#   destination = "/app/models"

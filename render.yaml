@@ -1,0 +1,41 @@
+services:
+  # Backend API Service
+  - type: web
+    name: smartpath-backend
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: "cd backend && pip install --no-cache-dir -r requirements.txt"
+    startCommand: "cd backend && gunicorn --bind 0.0.0.0:$PORT --workers 2 --timeout 120 app:app"
+    healthCheckPath: /api/health
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: TRAFFIC_PROVIDER
+        value: simulation
+      - key: WEATHER_PROVIDER
+        value: open_meteo
+      - key: INCIDENT_PROVIDER
+        value: simulation
+      - key: BACKEND_URL
+        value: https://smartpath-backend.onrender.com
+
+  # Optional: Cron job for model retraining (starter plan+)
+  # - type: cron
+  #   name: smartpath-retrain
+  #   env: python
+  #   schedule: "0 3 * * 0"  # Weekly on Sunday 3 AM
+  #   buildCommand: "cd backend && pip install --no-cache-dir -r requirements.txt"
+  #   startCommand: "cd backend && python -m training.train_dcrnn --epochs 50 --batch-size 32"
+  #   envVars:
+  #     - key: FLASK_ENV
+  #       value: production
+
+  # Optional: PostgreSQL database (if needed later)
+  # databases:
+  #   - name: smartpath-db
+  #     plan: free
+  #     databaseName: smartpath
+  #     user: smartpath_user
